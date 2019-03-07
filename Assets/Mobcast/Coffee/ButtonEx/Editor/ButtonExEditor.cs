@@ -124,7 +124,7 @@ namespace Mobcast.CoffeeEditor.UI
 			// イベントタイプ.
 			var spType = serializedObject.FindProperty("m_EventType");
 			int oldType = spType.intValue;
-			spType.intValue = (int)((EventType)EditorGUILayout.EnumMaskField(new GUIContent("Event Type"), (EventType)spType.intValue));
+			spType.intValue = (int)((EventType)EditorGUILayout.EnumFlagsField(new GUIContent("Event Type"), (EventType)spType.intValue));
 
 			// イベントタイプに合わせて、必要ななイベントのみ詳細を描画.
 			foreach (EventType e in System.Enum.GetValues(typeof(EventType)))

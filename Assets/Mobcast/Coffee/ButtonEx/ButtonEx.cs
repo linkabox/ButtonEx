@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
-
+using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -38,6 +39,12 @@ namespace Mobcast.Coffee.UI
 			Hold = 1 << 2,
 		}
 
+	    [Serializable]
+	    public class PressEvent : UnityEvent<bool>
+	    {
+
+	    }
+
 		//---- ▼ シリアライズ項目 ▼ ----
 		/// <summary>コールバック選択.</summary>
 		[SerializeField]
@@ -55,12 +62,12 @@ namespace Mobcast.Coffee.UI
 		public float m_PressRepeatInterval = 1f;
 
 		/// <summary>押下コールバック.</summary>
-		public UnityEvent onPress { get { return this.m_OnPress; } }
+		public PressEvent onPress { get { return this.m_OnPress; } }
 
 		/// <summary>押下コールバック.</summary>
 		[SerializeField]
-		UnityEvent m_OnPress = new Button.ButtonClickedEvent();
-		
+		PressEvent m_OnPress = new PressEvent();
+
 		/// <summary>長押し時間のしきい値.</summary>
 		[Range(0.1f, 5.0f)]
 		[SerializeField]
@@ -210,7 +217,7 @@ namespace Mobcast.Coffee.UI
 				timeNextPress = timePressing + m_PressRepeatInterval;
 				
 				if (0 != (m_EventType & EventType.Press))
-					onPress.Invoke();
+					onPress.Invoke(true);
 			}
 		}
 
@@ -223,6 +230,8 @@ namespace Mobcast.Coffee.UI
 			isPress = false;
 			timePressing = 0;
 
+		    if (0 != (m_EventType & EventType.Press))
+		        onPress.Invoke(false);
 #if DISALLOW_REFOCUS
 			// [再フォーカスを禁止している場合]
 			// PointerUp時にクリック可能かどうかチェックします.
@@ -289,7 +298,7 @@ namespace Mobcast.Coffee.UI
 			if (m_PressRepeat && timeNextPress < timePressing && 0 != (m_EventType & EventType.Press))
 			{
 				timeNextPress = timePressing + m_PressRepeatInterval;
-				onPress.Invoke();
+				onPress.Invoke(true);
 			}
 		}
 
